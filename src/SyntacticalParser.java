@@ -10,14 +10,15 @@ public class SyntacticalParser {
             // If second char is not LPAREN, throw error.
             case QUOTE:
                 LexicalParser.lex();
-                if (LexicalParser.nextToken == Token.LPAREN) {
-                    LexicalParser.lex();
-                    if (LexicalParser.nextToken != Token.RPAREN)
-                        items();
-                }
-                else
-                    throw new RuntimeException("list start with quote does not continue with LPAREN");
-                break;
+                if (LexicalParser.nextToken != Token.LPAREN)
+                    throw new RuntimeException("<list> -- expect '(' after quote in list");
+
+                LexicalParser.lex();
+                if (LexicalParser.nextToken != Token.RPAREN)
+                    items();
+
+                if (LexicalParser.nextToken != Token.RPAREN)
+                    throw new RuntimeException("<list> -- missing closing paren ')'");
 
             case LPAREN:
                 items();

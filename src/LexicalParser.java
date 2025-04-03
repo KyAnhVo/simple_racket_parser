@@ -88,11 +88,17 @@ public class LexicalParser {
         getNonBlank();
 
         switch (charClass) {
+            case PERIOD:
             case DIGIT:
+                boolean hasPeriod = false;
                 do {
+                    if (charClass == CharacterClass.PERIOD) {
+                        if (hasPeriod) break;
+                        else hasPeriod = true;
+                    }
                     addChar();
                     getChar();
-                } while (charClass == CharacterClass.DIGIT);
+                } while (charClass == CharacterClass.DIGIT || charClass == CharacterClass.PERIOD);
                 lexeme = lexemeBuilder.toString();
                 lexemeBuilder = new StringBuilder();
                 nextToken = Token.NUM_LITERAL;
