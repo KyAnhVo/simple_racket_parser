@@ -46,6 +46,8 @@ public class Syn {
                 if (Lex.nextToken != Token.RPAREN)
                     throw new RuntimeException("<list> -- missing closing paren ')'");
 
+                break;
+
             case LPAREN:
                 items();
         }

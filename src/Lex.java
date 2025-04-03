@@ -106,6 +106,7 @@ public class Lex {
 
             case LPAREN:
                 addChar();
+                getChar();
                 lexeme = lexemeBuilder.toString();
                 lexemeBuilder = new StringBuilder();
                 nextToken = Token.LPAREN;
@@ -113,6 +114,7 @@ public class Lex {
 
             case RPAREN:
                 addChar();
+                getChar();
                 lexeme = lexemeBuilder.toString();
                 lexemeBuilder = new StringBuilder();
                 nextToken = Token.RPAREN;
@@ -131,6 +133,7 @@ public class Lex {
 
             case EOF:
                 addChar();
+                getChar();
                 lexeme = lexemeBuilder.toString();
                 lexemeBuilder = new StringBuilder();
                 nextToken = Token.EOF;
@@ -138,6 +141,7 @@ public class Lex {
 
             case QUOTE:
                 addChar();
+                getChar();
                 lexeme = lexemeBuilder.toString();
                 lexemeBuilder = new StringBuilder();
                 nextToken = Token.QUOTE;
@@ -152,6 +156,7 @@ public class Lex {
                     throw new RuntimeException("Unterminated string literal");
 
                 addChar(); // add closing quote
+                getChar();
                 lexeme = lexemeBuilder.toString();
                 lexemeBuilder = new StringBuilder();
                 nextToken = Token.STR_LITERAL;
