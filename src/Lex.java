@@ -2,7 +2,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 
-public class LexicalParser {
+public class Lex {
     public static final int MAX_LEXEME_LENGTH = 60;
 
     public static Token nextToken;
@@ -10,12 +10,11 @@ public class LexicalParser {
     public static char nextChar;
     public static String lexeme;
     public static FileReader fileReader;
-
-    private static StringBuilder lexemeBuilder;
+    public static StringBuilder lexemeBuilder;
 
     public static void main(String[] args) throws Exception {
         if (args.length != 1) {
-            System.out.println("Usage: java LexicalParser <file>");
+            System.out.println("Usage: java Lex <file>");
             System.exit(1);
         }
 
@@ -68,6 +67,7 @@ public class LexicalParser {
         if (Character.isLetter(nextChar))           charClass = CharacterClass.LETTER;
         else if (Character.isDigit(nextChar))       charClass = CharacterClass.DIGIT;
         else if (Character.isWhitespace(nextChar))  charClass = CharacterClass.WHITESPACE;
+        else if (nextChar == '.')                   charClass = CharacterClass.PERIOD;
         else if (nextChar == '\'')                  charClass = CharacterClass.QUOTE;
         else if (nextChar == '\"')                  charClass = CharacterClass.STR_QUOTE;
         else if (nextChar == '(')                   charClass = CharacterClass.LPAREN;
@@ -93,7 +93,7 @@ public class LexicalParser {
                 boolean hasPeriod = false;
                 do {
                     if (charClass == CharacterClass.PERIOD) {
-                        if (hasPeriod) break;
+                        if (hasPeriod) throw new RuntimeException("A number cannot have 2 periods");
                         else hasPeriod = true;
                     }
                     addChar();

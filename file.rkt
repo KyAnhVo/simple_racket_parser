@@ -1,2 +1,2 @@
 (define lambda(X)
-    (+ X Y))
+    (+ X 0.5.34))
