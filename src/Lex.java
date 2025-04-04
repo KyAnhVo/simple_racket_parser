@@ -4,7 +4,6 @@ import java.io.IOException;
 
 public class Lex {
     public static final int MAX_LEXEME_LENGTH = 60;
-
     public static Token nextToken;
     public static CharacterClass charClass;
     public static char nextChar;
@@ -171,41 +170,26 @@ public class Lex {
                 } while (charClass == CharacterClass.LETTER
                         || charClass == CharacterClass.OTHER_ASCII
                         || charClass == CharacterClass.DIGIT);
+
                 lexeme = lexemeBuilder.toString();
                 lexemeBuilder = new StringBuilder();
 
                 switch(lexeme) {
                     case "lambda":
-                        nextToken = Token.LAMBDA_KW;
-                        break;
                     case "define":
-                        nextToken = Token.DEFINE_KW;
-                        break;
                     case "quote":
-                        nextToken = Token.QUOTE_KW;
-                        break;
                     case "car":
-                        nextToken = Token.CAR_KW;
-                        break;
                     case "cdr":
-                        nextToken = Token.CDR_KW;
-                        break;
                     case "cons":
-                        nextToken = Token.CONS_KW;
-                        break;
                     case "add1":
-                        nextToken = Token.ADD1_KW;
-                        break;
                     case "sub1":
-                        nextToken = Token.SUB1_KW;
+                        nextToken = Token.KEYWORD;
                         break;
                     default:
                         nextToken = Token.NAME;
                         break;
                 }
         }
-
-        getChar();
     }
 
 

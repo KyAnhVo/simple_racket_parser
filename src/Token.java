@@ -10,14 +10,7 @@ public enum Token {
     BOOL_LITERAL,
 
     // Keywords
-    LAMBDA_KW,
-    DEFINE_KW,
-    QUOTE_KW,
-    CAR_KW,
-    CDR_KW,
-    CONS_KW,
-    ADD1_KW,
-    SUB1_KW,
+    KEYWORD,
 
     // Others
     NAME,

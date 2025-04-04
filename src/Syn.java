@@ -13,16 +13,18 @@ public class Syn {
         try {
             Lex.fileReader = new FileReader(args[0]);
             Lex.lexemeBuilder = new StringBuilder();
+
             Lex.getChar();  // Initialize first character
+            Lex.lex();
 
             list();
         }
         catch (FileNotFoundException e) {
-            System.out.println("File not found");
+            System.err.println("File not found");
         } catch (IOException e) {
-            System.out.println("Error while reading file");
+            System.err.println("Error while reading file");
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.err.println(e.getMessage());
         }
     }
 
@@ -32,41 +34,76 @@ public class Syn {
         // If first char is quote, then read second char.
         switch (Lex.nextToken) {
 
-            // If first char is quote, then read second char. If second char is LPAREN, send to items.
-            // If second char is not LPAREN, throw error.
+            // '...
             case QUOTE:
                 Lex.lex();
                 if (Lex.nextToken != Token.LPAREN)
-                    throw new RuntimeException("<list> -- expect '(' after quote in list");
+                    throw new RuntimeException("<list> expect '(' after quote in list");
 
+                // '(<items>...
                 Lex.lex();
                 if (Lex.nextToken != Token.RPAREN)
                     items();
 
+                // ...)
                 if (Lex.nextToken != Token.RPAREN)
-                    throw new RuntimeException("<list> -- missing closing paren ')'");
+                    throw new RuntimeException("<list> missing closing paren ')'");
 
                 break;
 
+            // (<items>)
             case LPAREN:
                 items();
+                if (Lex.nextToken != Token.RPAREN)
+                    throw new RuntimeException("<list> not terminated");
         }
 
         System.out.println("Exiting <list>");
     }
 
-    public static void items() {
+    public static void items() throws Exception {
         System.out.println("Entering <items>");
+
+        // <item> {<item>}
+        do {
+            item();
+            Lex.lex();
+        }
+        while (Lex.nextToken != Token.RPAREN);
+
         System.out.println("Exiting <items>");
     }
 
-    public static void item() {
+    public static void item() throws Exception {
         System.out.println("Entering <item>");
+
+        Lex.lex();
+        if (Lex.nextToken == Token.LPAREN || Lex.nextToken == Token.QUOTE) {
+            list();
+        }
+        else {
+            atom();
+        }
+
         System.out.println("Exiting <item>");
     }
 
     public static void atom() {
         System.out.println("Entering <atom>");
+
+        switch (Lex.nextToken) {
+            case NUM_LITERAL:
+            case STR_LITERAL:
+            case BOOL_LITERAL:
+                literal();
+                break;
+            case NAME:
+            case KEYWORD:
+                break;
+            default:
+                throw new RuntimeException("<atom> unknown token");
+        }
+
         System.out.println("Exiting <atom>");
     }
 
