@@ -30,7 +30,7 @@ public class Lex {
                 System.out.println(nextToken + ": " + lexeme);
                 lex();
             }
-            System.out.println("EOF reached");
+            System.out.println(nextToken + ": " + lexeme);
 
         } catch (FileNotFoundException e) {
             System.out.println("File not found: " + args[0]);
@@ -73,7 +73,7 @@ public class Lex {
         else if (nextChar == ')')                   charClass = CharacterClass.RPAREN;
         else if (nextChar == '#')                   charClass = CharacterClass.HASH;
         else if (nextChar == (char) -1)             charClass = CharacterClass.EOF;
-        else                                        charClass = CharacterClass.OTHER_ASCII;
+        else if ()                                       charClass = CharacterClass.OTHER_ASCII;
     }
 
     public static void getNonBlank() throws IOException {

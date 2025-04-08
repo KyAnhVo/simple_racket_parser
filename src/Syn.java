@@ -17,7 +17,7 @@ public class Syn {
             Lex.getChar();  // Initialize first character
             Lex.lex();
 
-            list();
+            list(0);
         }
         catch (FileNotFoundException e) {
             System.err.println("File not found");
@@ -28,87 +28,119 @@ public class Syn {
         }
     }
 
-    public static void list() throws Exception {
-        System.out.println("Entering <list>");
+    public static void list(int tabs) throws Exception {
+        enterStatement(tabs, "list");
 
         // If first char is quote, then read second char.
         switch (Lex.nextToken) {
 
             // '...
+
             case QUOTE:
                 Lex.lex();
+
+                // ...(...
+
                 if (Lex.nextToken != Token.LPAREN)
                     throw new RuntimeException("<list> expect '(' after quote in list");
-
-                // '(<items>...
                 Lex.lex();
+
+                // ...<items>...
+
                 if (Lex.nextToken != Token.RPAREN)
-                    items();
+                    items(tabs + 1);
 
                 // ...)
+
+                // or '()
                 if (Lex.nextToken != Token.RPAREN)
                     throw new RuntimeException("<list> missing closing paren ')'");
+                Lex.lex();
 
                 break;
 
-            // (<items>)
+            // (...
+
             case LPAREN:
-                items();
+                Lex.lex();
+
+                // ...<items>... or ...<nothing>...
+
+                if (Lex.nextToken != Token.RPAREN)
+                    items(tabs + 1);
+
+                // ...)
+
                 if (Lex.nextToken != Token.RPAREN)
                     throw new RuntimeException("<list> not terminated");
+                Lex.lex();
         }
 
-        System.out.println("Exiting <list>");
+        exitStatement(tabs, "list");
     }
 
-    public static void items() throws Exception {
-        System.out.println("Entering <items>");
+    public static void items(int tabs) throws Exception {
+        enterStatement(tabs, "items");
 
         // <item> {<item>}
+
         do {
-            item();
-            Lex.lex();
+            item(tabs + 1);
         }
         while (Lex.nextToken != Token.RPAREN);
 
-        System.out.println("Exiting <items>");
+        exitStatement(tabs, "items");
     }
 
-    public static void item() throws Exception {
-        System.out.println("Entering <item>");
+    public static void item(int tabs) throws Exception {
+        enterStatement(tabs, "item");
 
-        Lex.lex();
         if (Lex.nextToken == Token.LPAREN || Lex.nextToken == Token.QUOTE) {
-            list();
+            list(tabs + 1);
         }
         else {
-            atom();
+            atom(tabs + 1);
         }
 
-        System.out.println("Exiting <item>");
+        exitStatement(tabs, "item");
     }
 
-    public static void atom() {
-        System.out.println("Entering <atom>");
+    public static void atom(int tabs) throws Exception {
+        enterStatement(tabs, "atom");
 
         switch (Lex.nextToken) {
             case NUM_LITERAL:
             case STR_LITERAL:
             case BOOL_LITERAL:
-                literal();
+                literal(tabs + 1);
                 break;
             case NAME:
             case KEYWORD:
+                Lex.lex();
                 break;
             default:
                 throw new RuntimeException("<atom> unknown token");
         }
 
-        System.out.println("Exiting <atom>");
+
+        exitStatement(tabs, "atom");
     }
 
-    public static void literal() {
-        System.out.println("Entering <literal>");
-        System.out.println("Exiting <literal>");
+    public static void literal(int tabs) throws Exception {
+        enterStatement(tabs, "literal");
+        Lex.lex();
+        exitStatement(tabs, "literal");
+    }
+
+    private static void exitStatement(int tabs, String nonLeaf) {
+        for (int i = 0; i < tabs; i++)
+            System.out.print("|\t");
+        System.out.println("Exiting <" + nonLeaf + ">, current lexeme: " + Lex.lexeme);
+    }
+
+    private static void enterStatement(int tabs, String nonLeaf) {
+        for (int i = 0; i < tabs; i++)
+            System.out.print("|\t");
+        System.out.println("Entering <" + nonLeaf + ">, current lexeme: " + Lex.lexeme);
     }
 }
