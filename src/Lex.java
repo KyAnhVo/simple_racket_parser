@@ -73,7 +73,7 @@ public class Lex {
         else if (nextChar == ')')                   charClass = CharacterClass.RPAREN;
         else if (nextChar == '#')                   charClass = CharacterClass.HASH;
         else if (nextChar == (char) -1)             charClass = CharacterClass.EOF;
-        else if ()                                       charClass = CharacterClass.OTHER_ASCII;
+        else                                        charClass = CharacterClass.OTHER_ASCII;
     }
 
     public static void getNonBlank() throws IOException {
