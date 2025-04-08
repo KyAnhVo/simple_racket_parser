@@ -6,7 +6,7 @@ public class Syn {
 
     public static void main(String[] args) {
         if (args.length != 1) {
-            System.out.println("Usage: java Lex <file>");
+            System.out.println("Usage: java Syn <file>");
             System.exit(1);
         }
 
