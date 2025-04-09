@@ -2,20 +2,30 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 
-public class Syn {
+public class SyntacticParser {
 
     public static void main(String[] args) {
         if (args.length != 1) {
-            System.out.println("Usage: java Syn <file>");
+            System.out.println("Usage: java SyntacticParser <file>");
             System.exit(1);
         }
 
         try {
-            Lex.fileReader = new FileReader(args[0]);
-            Lex.lexemeBuilder = new StringBuilder();
+            parseSyntax(args[0]);
+        }
+        catch (Exception e) {
+            System.err.println(e.getMessage());
+        }
 
-            Lex.getChar();  // Initialize first character
-            Lex.lex();
+    }
+
+    public static void parseSyntax(String fileName) throws Exception {
+        try {
+            LexicalParser.fileReader = new FileReader(fileName);
+            LexicalParser.lexemeBuilder = new StringBuilder();
+
+            LexicalParser.getChar();  // Initialize first character
+            LexicalParser.lex();
 
             list(0);
         }
@@ -25,6 +35,10 @@ public class Syn {
             System.err.println("Error while reading file");
         } catch (Exception e) {
             System.err.println(e.getMessage());
+        } finally {
+            if (LexicalParser.fileReader != null) {
+                LexicalParser.fileReader.close();
+            }
         }
     }
 
@@ -32,48 +46,40 @@ public class Syn {
         enterStatement(tabs, "list");
 
         // If first char is quote, then read second char.
-        switch (Lex.nextToken) {
+        switch (LexicalParser.nextToken) {
 
             // '...
-
             case QUOTE:
-                Lex.lex();
+                LexicalParser.lex();
 
                 // ...(...
-
-                if (Lex.nextToken != Token.LPAREN)
+                if (LexicalParser.nextToken != Token.LPAREN)
                     throw new RuntimeException("<list> expect '(' after quote in list");
-                Lex.lex();
+                LexicalParser.lex();
 
                 // ...<items>...
-
-                if (Lex.nextToken != Token.RPAREN)
+                if (LexicalParser.nextToken != Token.RPAREN)
                     items(tabs + 1);
 
                 // ...)
-
-                // or '()
-                if (Lex.nextToken != Token.RPAREN)
+                if (LexicalParser.nextToken != Token.RPAREN)
                     throw new RuntimeException("<list> missing closing paren ')'");
-                Lex.lex();
+                LexicalParser.lex();
 
                 break;
 
             // (...
-
             case LPAREN:
-                Lex.lex();
+                LexicalParser.lex();
 
                 // ...<items>... or ...<nothing>...
-
-                if (Lex.nextToken != Token.RPAREN)
+                if (LexicalParser.nextToken != Token.RPAREN)
                     items(tabs + 1);
 
                 // ...)
-
-                if (Lex.nextToken != Token.RPAREN)
+                if (LexicalParser.nextToken != Token.RPAREN)
                     throw new RuntimeException("<list> not terminated");
-                Lex.lex();
+                LexicalParser.lex();
         }
 
         exitStatement(tabs, "list");
@@ -87,7 +93,7 @@ public class Syn {
         do {
             item(tabs + 1);
         }
-        while (Lex.nextToken != Token.RPAREN);
+        while (LexicalParser.nextToken != Token.RPAREN);
 
         exitStatement(tabs, "items");
     }
@@ -95,7 +101,7 @@ public class Syn {
     public static void item(int tabs) throws Exception {
         enterStatement(tabs, "item");
 
-        if (Lex.nextToken == Token.LPAREN || Lex.nextToken == Token.QUOTE) {
+        if (LexicalParser.nextToken == Token.LPAREN || LexicalParser.nextToken == Token.QUOTE) {
             list(tabs + 1);
         }
         else {
@@ -108,7 +114,7 @@ public class Syn {
     public static void atom(int tabs) throws Exception {
         enterStatement(tabs, "atom");
 
-        switch (Lex.nextToken) {
+        switch (LexicalParser.nextToken) {
             case NUM_LITERAL:
             case STR_LITERAL:
             case BOOL_LITERAL:
@@ -116,7 +122,7 @@ public class Syn {
                 break;
             case NAME:
             case KEYWORD:
-                Lex.lex();
+                LexicalParser.lex();
                 break;
             default:
                 throw new RuntimeException("<atom> unknown token");
@@ -128,19 +134,19 @@ public class Syn {
 
     public static void literal(int tabs) throws Exception {
         enterStatement(tabs, "literal");
-        Lex.lex();
+        LexicalParser.lex();
         exitStatement(tabs, "literal");
     }
 
     private static void exitStatement(int tabs, String nonLeaf) {
         for (int i = 0; i < tabs; i++)
             System.out.print("|\t");
-        System.out.println("Exiting <" + nonLeaf + ">, current lexeme: " + Lex.lexeme);
+        System.out.println("Exiting <" + nonLeaf + ">, current lexeme: " + LexicalParser.lexeme);
     }
 
     private static void enterStatement(int tabs, String nonLeaf) {
         for (int i = 0; i < tabs; i++)
             System.out.print("|\t");
-        System.out.println("Entering <" + nonLeaf + ">, current lexeme: " + Lex.lexeme);
+        System.out.println("Entering <" + nonLeaf + ">, current lexeme: " + LexicalParser.lexeme);
     }
 }

@@ -2,7 +2,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 
-public class Lex {
+public class LexicalParser {
     public static final int MAX_LEXEME_LENGTH = 60;
     public static Token nextToken;
     public static CharacterClass charClass;
@@ -13,12 +13,16 @@ public class Lex {
 
     public static void main(String[] args) throws Exception {
         if (args.length != 1) {
-            System.out.println("Usage: java Lex <file>");
+            System.out.println("Usage: java LexicalParser <file>");
             System.exit(1);
         }
 
+        parseLexical(args[0]);
+    }
+
+    public static void parseLexical(String fileName) throws Exception {
         try {
-            fileReader = new FileReader(args[0]);
+            fileReader = new FileReader(fileName);
             lexemeBuilder = new StringBuilder();
             getChar();  // Initialize first character
 
@@ -33,7 +37,7 @@ public class Lex {
             System.out.println(nextToken + ": " + lexeme);
 
         } catch (FileNotFoundException e) {
-            System.out.println("File not found: " + args[0]);
+            System.out.println("File not found: " + fileName);
         } finally {
             if (fileReader != null) {
                 fileReader.close();
